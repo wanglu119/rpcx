@@ -202,6 +202,9 @@ type Option struct {
 
 	// not call server message handler
 	NilCallServerMessageHandler func(msg *protocol.Message)
+
+	// wl_add: socket error handler
+	CallOnClientErrorHandler func(err error)
 }
 
 // Call represents an active RPC.
@@ -775,6 +778,9 @@ func (client *Client) input() {
 
 	if err != nil && !closing {
 		log.Errorf("rpcx: client protocol error: %v", err)
+		if client.option.CallOnClientErrorHandler != nil {
+			client.option.CallOnClientErrorHandler(err)
+		}
 	}
 }
 
